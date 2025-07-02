@@ -220,7 +220,11 @@ function formatEnv(val: Record<string, string>) {
  * @returns {string[]} 恢复后的参数值
  */
 function receveArgs(val: string) {
-	return val.split('\n');
+	if (val) {
+		return val.split('\n');
+	} else {
+		return []
+	}
 }
 /**
  * @description 恢复环境变量
