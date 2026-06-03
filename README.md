@@ -34,6 +34,9 @@ A user-friendly AI assistant software that supports local AI models, APIs, and k
 - Supports web search
 ![Web search](.github/assets/img/6_en.png)
 
+  To use Bocha as the default web search engine, set `BOCHA_SEARCH_API_KEY` in the runtime environment.
+  Optional variables: `BOCHA_SEARCH_API_URL` and `BOCHA_SEARCH_RESULT_COUNT`.
+
 - Supports server-side deployment 
 
 - MCP Client

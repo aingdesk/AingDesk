@@ -26,6 +26,9 @@ AingDesk是一款简单好用的AI助手，支持知识库、模型API、分享�
 - 支持联网搜索
 ![联网搜索](.github/assets/img/6_zh.png)
 
+  使用 Bocha 作为默认联网搜索引擎时，请在运行环境中设置 `BOCHA_SEARCH_API_KEY`。
+  可选环境变量：`BOCHA_SEARCH_API_URL`、`BOCHA_SEARCH_RESULT_COUNT`。
+
 - 支持服务器端部署
 - 单次多模型同时对话（即将上线） 
 
