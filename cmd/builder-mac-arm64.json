@@ -30,12 +30,12 @@
       "repo": "aingdesk"
     }
   ],
+  "afterSign": "build/notarize.js",
   "mac": {
     "icon": "build/icons/icon.icns",
     "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
     "darkModeSupport": true,
     "hardenedRuntime": true,
-    "gatekeeperAssess":false,
-    "identity": ""
+    "gatekeeperAssess": false
   }
 }
