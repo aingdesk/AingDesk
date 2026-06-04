@@ -50,9 +50,6 @@ module.exports = {
     win_7z: {
       args: ['--config=./cmd/builder.json', '-w=7z', '--x64'],
     },
-    mac: {
-      args: ['--config=./cmd/builder-mac.json', '-m'],
-    },
     mac_arm64: {
       args: ['--config=./cmd/builder-mac-arm64.json', '-m', '--arm64'],
     },

@@ -1,0 +1,46 @@
+{
+  "mcpServers": [
+    {
+      "name": "filesystem",
+      "description": "读写本地文件系统(指定目录)的 MCP 服务器",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    },
+    {
+      "name": "fetch",
+      "description": "抓取网页并转换为适合大模型阅读的内容",
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    {
+      "name": "memory",
+      "description": "基于知识图谱的持久记忆 MCP 服务器",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    {
+      "name": "sequential-thinking",
+      "description": "支持分步推理/思维链的 MCP 服务器",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    {
+      "name": "time",
+      "description": "时间与时区转换 MCP 服务器",
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-time"]
+    },
+    {
+      "name": "everything",
+      "description": "包含全部参考能力的演示用 MCP 服务器",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"]
+    }
+  ]
+}

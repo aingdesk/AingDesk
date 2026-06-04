@@ -4,6 +4,7 @@ import { logger } from 'ee-core/log';
 import axios from 'axios';
 import fs from 'fs';
 import { ServerConfig, McpConfig } from './mcp_client';
+import { getBunDownloadInfo, extractArchive, findFileRecursive, moveFile } from '../class/bin_assets';
 
 
 class McpService {
@@ -210,35 +211,37 @@ class McpService {
         }
         global.bunInstall = true;
         let binPath = this.get_bin_path();
-        let os_path = this.get_os_path();
 
-        let downloadUrl = `https://aingdesk.bt.cn/bin/${os_path}/bun.zip`
-        let bunzipFile = path.resolve(binPath, 'bun.zip');
+        // 从官方上游(oven-sh/bun) 直连下载，上游包内层为 bun-<platform>/bun(.exe)
+        const { url, format } = getBunDownloadInfo();
+        let bunArchiveFile = path.resolve(binPath, 'bun-download.zip');
+        let extractDir = path.resolve(binPath, 'bun-extract');
 
-        this.download_file(downloadUrl, bunzipFile).then(async() =>{
-            // 解压缩
-            let unzip = require('unzipper');
-            let unzipStream = fs.createReadStream(bunzipFile).pipe(unzip.Extract({ path: binPath }));
-            return new Promise((resolve, reject) => {
-                unzipStream.on('close', () => {
-                    // 删除压缩包
-                    pub.delete_file(bunzipFile);
-                    // 设置执行权限
-                    if(pub.file_exists(bunFile)){
-                        if (pub.is_linux() || pub.is_mac()) {
-                            fs.chmodSync(bunFile, 0o755);
-                        }
-                        resolve(pub.return_success(pub.lang('安装成功')));
-                    }else{
-                        reject(pub.return_error(pub.lang('安装失败')));
-                    }
-                });
-                unzipStream.on('error', (error: any) => {
-                    reject(pub.return_error(pub.lang('安装失败'), error));
-                });
-            });
-        })
-
+        try {
+            const ok = await this.download_file(url, bunArchiveFile);
+            if (!ok) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            await extractArchive(bunArchiveFile, extractDir, format);
+            // 把内层子目录中的 bun 二进制提升到 bin 根目录
+            const binName = pub.is_windows() ? 'bun.exe' : 'bun';
+            const found = findFileRecursive(extractDir, binName);
+            if (!found) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            moveFile(found, bunFile);
+            if (pub.is_linux() || pub.is_mac()) {
+                fs.chmodSync(bunFile, 0o755);
+            }
+            return pub.return_success(pub.lang('安装成功'));
+        } catch (e) {
+            logger.error('安装 bun 失败:', e);
+            return pub.return_error(pub.lang('安装失败'));
+        } finally {
+            pub.delete_file(bunArchiveFile);
+            try { fs.rmSync(extractDir, { recursive: true, force: true }); } catch { /* ignore */ }
+            global.bunInstall = false;
+        }
     }
 
     /**
@@ -300,22 +303,27 @@ class McpService {
     }
 
     /**
-     * 同步云端的 MCP 服务器配置
+     * 同步常用 MCP 服务器配置
+     *
+     * 原先依赖宝塔官网(aingdesk.bt.cn/config/common-mcp-server.json，现已 404)，
+     * 现改为读取随包内置的 common-mcp-server.json(build/extraResources)，不再走网络。
      * @returns {Promise<any>} - 返回同步结果
      */
     async sync_cloud_mcp(){
-        let downloadUrl = `https://aingdesk.bt.cn/config/common-mcp-server.json`;
-        let res = await pub.httpRequest(downloadUrl)
-        
-        if(res.statusCode !== 200){
+        let bundledFile = path.resolve(pub.get_resource_path(), 'common-mcp-server.json');
+        if(!pub.file_exists(bundledFile)){
             return pub.return_error(pub.lang('获取失败'));
         }
-        
-        let commonMcpConfig = res.body;
-        if(typeof commonMcpConfig === 'string'){
-            commonMcpConfig = JSON.parse(commonMcpConfig);
+
+        let commonMcpConfig: any;
+        try {
+            commonMcpConfig = pub.read_json(bundledFile);
+        } catch (e) {
+            logger.error('读取内置 common-mcp-server.json 失败:', e);
+            return pub.return_error(pub.lang('配置文件格式错误'));
         }
-        if(!commonMcpConfig.mcpServers){
+
+        if(!commonMcpConfig || !commonMcpConfig.mcpServers){
             return pub.return_error(pub.lang('配置文件格式错误'));
         }
         mcpService.save_common_mcp_config(commonMcpConfig);

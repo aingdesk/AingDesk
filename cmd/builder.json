@@ -34,8 +34,9 @@
   },
   "publish": [
     {
-      "provider": "generic",
-      "url": "https://www.bt.cn"
+      "provider": "github",
+      "owner": "aingdesk",
+      "repo": "aingdesk"
     }
   ],
   "win": {

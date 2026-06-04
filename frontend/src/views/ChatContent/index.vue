@@ -47,8 +47,6 @@
     <ChatTools />
     <!-- 模型管理弹窗 -->
     <Settings />
-    <!-- 分享弹窗 -->
-    <Share />
 
     <!-- 文档预览 -->
     <div class="doc-content" v-if="activeKnowledge">
@@ -70,7 +68,6 @@ import { mouseLeave, scrollCallback, scrollMove } from "@/views/ChatContent/cont
 
 // 附件图标
 import MarkdownRender from "@/views/Answer/components/MarkdownRender.vue"
-import Share from "@/views/Header/components/Share.vue"
 import Settings from '@/views/Settings/index.vue';
 import { eventBUS } from '@/views/Home/utils/tools';
 import { getHeaderStoreData } from '../Header/store';

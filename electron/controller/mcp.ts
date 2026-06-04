@@ -3,6 +3,8 @@ import * as path from 'path';
 import { logger } from 'ee-core/log';
 import { ServerConfig, ToolInfo, MCPClient ,McpConfig} from '../service/mcp_client';
 import { mcpService } from '../service/mcp';
+import fs from 'fs';
+import { getUvDownloadInfo, extractArchive, findFileRecursive, moveFile } from '../class/bin_assets';
 
 
 
@@ -350,29 +352,44 @@ class McpController {
         }
         global.uvInstall = true;
         let binPath = mcpService.get_bin_path();
-        let os_path = mcpService.get_os_path();
 
-        let downloadUrl = `https://aingdesk.bt.cn/bin/${os_path}/uv.zip`
-        let uvzipFile = path.resolve(binPath, 'uv.zip');
+        // 从官方上游(astral-sh/uv) 直连下载：
+        // - Windows 为 zip，根目录含 uv.exe/uvx.exe
+        // - macOS/Linux 为 tar.gz，内层 uv-<target>/uv、uvx
+        const { url, format } = getUvDownloadInfo();
+        let uvArchiveFile = path.resolve(binPath, format === 'tgz' ? 'uv-download.tar.gz' : 'uv-download.zip');
+        let extractDir = path.resolve(binPath, 'uv-extract');
 
-        await mcpService.download_file(downloadUrl, uvzipFile);
-
-        // 解压缩
-        let unzip = require('unzipper');
-        let fs = require('fs');
-        let unzipStream = fs.createReadStream(uvzipFile).pipe(unzip.Extract({ path: binPath }));
-        return new Promise((resolve, reject) => {
-            unzipStream.on('close', () => {
-                // 删除压缩包
-                pub.delete_file(uvzipFile);
-                
-                resolve(pub.return_success(pub.lang('安装成功')));
-            });
-            unzipStream.on('error', (error: any) => {
-                reject(pub.return_error(pub.lang('安装失败'), error));
-            });
-        });
-
+        try {
+            const ok = await mcpService.download_file(url, uvArchiveFile);
+            if (!ok) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            await extractArchive(uvArchiveFile, extractDir, format);
+            // 把 uv / uvx 提升到 bin 根目录
+            const exe = pub.is_windows() ? '.exe' : '';
+            for (const name of [`uv${exe}`, `uvx${exe}`]) {
+                const found = findFileRecursive(extractDir, name);
+                if (found) {
+                    const dst = path.resolve(binPath, name);
+                    moveFile(found, dst);
+                    if (pub.is_linux() || pub.is_mac()) {
+                        fs.chmodSync(dst, 0o755);
+                    }
+                }
+            }
+            if (!pub.file_exists(uvFile)) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            return pub.return_success(pub.lang('安装成功'));
+        } catch (error: any) {
+            logger.error('安装 uv 失败:', error);
+            return pub.return_error(pub.lang('安装失败'), error);
+        } finally {
+            pub.delete_file(uvArchiveFile);
+            try { fs.rmSync(extractDir, { recursive: true, force: true }); } catch { /* ignore */ }
+            global.uvInstall = false;
+        }
     }
 
     /**

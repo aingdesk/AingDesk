@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-AingDesk是一款简单好用的AI助手，支持知识库、模型API、分享、联网搜索、智能体，它还在飞快成长中。
+AingDesk是一款简单好用的AI助手，支持知识库、模型API、联网搜索、智能体，它还在飞快成长中。
 
 ## 🚀一句话简介
 
@@ -20,9 +20,6 @@ AingDesk是一款简单好用的AI助手，支持知识库、模型API、分享�
 - 智能体创建
 ![智能体](.github/assets/img/4_zh.png)
 
-- 可在线分享给他人使用
-![分享](.github/assets/img/5_zh.png)
-
 - 支持联网搜索
 ![联网搜索](.github/assets/img/6_zh.png)
 
@@ -35,7 +32,10 @@ AingDesk是一款简单好用的AI助手，支持知识库、模型API、分享�
 
 ## 📥快速安装
 
-### 客户端版本（MacOS, Windows）
+### 客户端版本（macOS Apple Silicon, Windows）
+
+> 注意：自下个版本起，macOS 客户端仅支持 Apple Silicon(arm64)，不再支持 Intel 芯片的 Mac。
+
 - [官网下载](https://www.aingdesk.com/)   
 - [从 CNB 下载](https://cnb.cool/aingdesk/AingDesk/-/releases/) 
 - [从 Github 下载](https://github.com/aingdesk/AingDesk/releases)  
@@ -70,7 +70,6 @@ docker-compose up -d
 ```bash
 git clone https://github.com/aingdesk/AingDesk.git
 cd AingDesk
-# macOS用户请删除frontend/package.json中的`@rollup/rollup-win32-x64-msvc`依赖
 cd frontend
 yarn
 cd ..

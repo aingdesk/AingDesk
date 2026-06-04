@@ -11,9 +11,9 @@
 
 [简体中文](README.zh_cn.md) | [Official Website](https://www.aingdesk.com/) | [Documentation](https://docs.aingdesk.com/)
 
-AingDesk是一款简单好用的AI助手，支持知识库、模型API、分享、联网搜索、智能体，它还在飞快成长中。
+AingDesk是一款简单好用的AI助手，支持知识库、模型API、联网搜索、智能体，它还在飞快成长中。
 
-AingDesk is an easy-to-use AI assistant that supports knowledge bases, model APIs, sharing, web search, and intelligent agents. It's rapidly growing and improving.
+AingDesk is an easy-to-use AI assistant that supports knowledge bases, model APIs, web search, and intelligent agents. It's rapidly growing and improving.
 
 ## 🚀 One-sentence Introduction  
 
@@ -27,9 +27,6 @@ A user-friendly AI assistant software that supports local AI models, APIs, and k
 ![Knowledge base](.github/assets/img/3_en.png)
 - Intelligent agent creation
 ![Intelligent agent](.github/assets/img/4_en.png)
-  
-- Can be shared online for others to use
-![Sharing](.github/assets/img/5_en.png)
 
 - Supports web search
 ![Web search](.github/assets/img/6_en.png)
@@ -46,7 +43,9 @@ A user-friendly AI assistant software that supports local AI models, APIs, and k
 
 ## 📥 Quick Installation
 
-### Client Version（MacOS, Windows） 
+### Client Version（macOS Apple Silicon, Windows） 
+
+> Note: Starting from the next release, the macOS client only supports Apple Silicon (arm64). Intel-based Macs are no longer supported.
 
 - [Download from official website](https://www.aingdesk.com/)   
 - [Download from CNB](https://cnb.cool/aingdesk/AingDesk/-/releases/)  
@@ -82,7 +81,6 @@ docker-compose up -d
 ```bash
 git clone https://github.com/aingdesk/AingDesk.git
 cd AingDesk
-# For macOS users, please remove the `@rollup/rollup-win32-x64-msvc` dependency in [package.json](http://_vscodecontentref_/0)
 cd frontend
 yarn
 cd ..

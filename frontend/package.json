@@ -33,7 +33,6 @@
   },
   "devDependencies": {
     "@iconify/json": "^2.2.312",
-    "@rollup/rollup-win32-x64-msvc": "^4.34.8",
     "@tsconfig/node22": "^22.0.0",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.10.7",

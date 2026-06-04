@@ -22,8 +22,9 @@ class AutoUpdaterService {
             macOS: true,
             linux: true,
             options: {
-                provider: 'generic',
-                url: 'https://aingdesk.bt.cn/'
+                provider: 'github',
+                owner: 'aingdesk',
+                repo: 'aingdesk'
             },
             force: true,
         }
@@ -56,12 +57,8 @@ class AutoUpdaterService {
         const version = electronApp.getVersion();
         logger.info('[autoUpdater] current version: ', version);
 
-        // 设置下载服务器地址
-        let server = cfg.options.url;
-        let lastChar = server.substring(server.length - 1);
-        server = lastChar === '/' ? server : server + "/";
-        logger.info('[autoUpdater] server: ', server);
-        cfg.options.url = server;
+        // 更新源：GitHub Releases(aingdesk/aingdesk)
+        logger.info('[autoUpdater] provider: ', cfg.options.provider);
 
         // 强制执行开发更新
         autoUpdater.forceDevUpdateConfig = true

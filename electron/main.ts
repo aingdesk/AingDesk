@@ -20,12 +20,7 @@ app.register("preload", preload);
 
 // Register service
 setTimeout(() => {
-    // 分享服务
-    const { shareService } = require('./service/share');
     const {mcpService} = require('./service/mcp');
-    const shareIdPrefix = shareService.generateUniquePrefix();
-    let socket = shareService.connectToCloudServer(shareIdPrefix);
-    shareService.startReconnect(socket,shareIdPrefix);
 
     // RAG后台任务
     const { RagTask } = require('./rag/rag_task');

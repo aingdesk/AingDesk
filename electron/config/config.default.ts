@@ -29,7 +29,7 @@ const config: () => AppConfig = () => {
     },
     remote: {
       enable: false,
-      url: 'http://www.bt.cn/',
+      url: 'about:blank',
     },
     socketServer: {
       enable: true,

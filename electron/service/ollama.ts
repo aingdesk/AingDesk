@@ -4,7 +4,7 @@ import * as path from 'path';
 import axios from 'axios';
 import * as fs from 'fs';
 import { logger } from 'ee-core/log';
-import { selectFastestNode } from '../class/test_node';
+import { getOllamaDownloadInfo as getOllamaUpstreamInfo } from '../class/bin_assets';
 // const { exec, execSync } = require('child_process');
 import { exec, execSync } from 'child_process';
 
@@ -744,25 +744,16 @@ class OllamaService {
      * @returns {downloadUrl: string, downloadFile: string } 包含下载 URL 和文件路径的对象
      */
     private async getOllamaDownloadInfo(): Promise<{ downloadUrl: string , downloadFile: string }> {
-        if (pub.is_windows()) {
-            return {
-                downloadUrl: `http://aingdesk.bt.cn/OllamaSetup.exe`,
-                downloadFile: path.resolve(pub.get_resource_path(), 'OllamaSetup.exe')
-            };
-        } else if (pub.is_mac()) {
-            return {
-                downloadUrl: `http://aingdesk.bt.cn/Ollama-darwin.zip`,
-                downloadFile: path.resolve(pub.get_resource_path(), 'ollama-darwin.zip')
-            };
-        } else if (pub.is_linux()) {
-            let nodeUrl = await selectFastestNode()
-            return {
-                downloadUrl: `${nodeUrl}/ollama/ollama-linix-amd64.tgz`,
-                downloadFile: path.resolve(pub.get_resource_path(), 'ollama-linix-amd64.tgz')
-            };
+        // 从 Ollama 官方上游(GitHub Releases) 直连下载，按操作系统/架构选择资产
+        const info = getOllamaUpstreamInfo();
+        if (!info) {
+            logger.info(pub.lang('不支持的操作系统'));
+            return { downloadUrl: "", downloadFile: "" };
         }
-        logger.info(pub.lang('不支持的操作系统'));
-        return { downloadUrl: "", downloadFile: "" };
+        return {
+            downloadUrl: info.url,
+            downloadFile: path.resolve(pub.get_resource_path(), info.filename)
+        };
     }
 
     /**
@@ -841,7 +832,7 @@ Description=Ollama Service
 After=network-online.target
 
 [Service]
-ExecStart=/usr/local/ollama serve
+ExecStart=/usr/local/bin/ollama serve
 User=${currentUser}
 Group=${currentUser}
 Restart=always

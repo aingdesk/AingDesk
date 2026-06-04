@@ -5,6 +5,7 @@ import { logger } from 'ee-core/log';
 import axios from 'axios';
 import { exec } from 'child_process';
 import { initializeWorker,postProcessText,filterLowConfidenceLines,CONFIDENCE_THRESHOLD } from './image_parse';  // 这里引入了image_parse.ts中的函数，用于识别图片内容
+import { getPopplerWindowsDownloadUrl, extractArchive, findFileRecursive, copyDirContents } from '../../../class/bin_assets';
 // import * as pdfjsLib from 'pdfjs-dist';
 
 
@@ -189,36 +190,38 @@ export class PdfParser {
             return pub.return_success(pub.lang('已安装'));
         }
         global.popplerInstall = true;
-        let binPath = path.dirname(this.get_poppler_path());
-        let os_path = this.get_os_path();
+        let popplerDir = this.get_poppler_path();        // bin/poppler
+        let binParent = path.dirname(popplerDir);        // bin
+        let popplerzipFile = path.resolve(binParent, 'poppler.zip');
+        let extractDir = path.resolve(binParent, 'poppler-extract');
 
-        let downloadUrl = `https://aingdesk.bt.cn/bin/${os_path}/poppler.zip`
-        let popplerzipFile = path.resolve(binPath, 'poppler.zip');
-
-        await this.download_file(downloadUrl, popplerzipFile).then(async () => {
-            // 解压缩
-            let unzip = require('unzipper');
-            let unzipStream = fs.createReadStream(popplerzipFile).pipe(unzip.Extract({ path: binPath }));
-            return new Promise((resolve, reject) => {
-                unzipStream.on('close', () => {
-                    // 删除压缩包
-                    pub.delete_file(popplerzipFile);
-                    // 设置执行权限
-                    if (pub.file_exists(popplerFile)) {
-                        if (pub.is_linux() || pub.is_mac()) {
-                            fs.chmodSync(popplerFile, 0o755);
-                        }
-                        resolve(pub.lang('安装成功'));
-                    } else {
-                        console.log(popplerFile)
-                        reject('安装失败');
-                    }
-                });
-                unzipStream.on('error', (error: any) => {
-                    reject(error);
-                });
-            });
-        })
+        try {
+            // 从官方上游(oschwartz10612/poppler-windows) 直连下载最新 release
+            let downloadUrl = await getPopplerWindowsDownloadUrl();
+            const ok = await this.download_file(downloadUrl, popplerzipFile);
+            if (!ok) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            await extractArchive(popplerzipFile, extractDir, 'zip');
+            // 上游包内层为 poppler-<ver>/Library/bin/*(含 pdfimages.exe 及其依赖 dll)
+            const pdfimages = findFileRecursive(extractDir, 'pdfimages.exe');
+            if (!pdfimages) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            // 把整个 bin 目录内容(含 dll)拷到 bin/poppler
+            copyDirContents(path.dirname(pdfimages), popplerDir);
+            if (!pub.file_exists(popplerFile)) {
+                return pub.return_error(pub.lang('安装失败'));
+            }
+            return pub.return_success(pub.lang('安装成功'));
+        } catch (error: any) {
+            logger.error('安装 poppler 失败:', error);
+            return pub.return_error(pub.lang('安装失败'));
+        } finally {
+            pub.delete_file(popplerzipFile);
+            try { fs.rmSync(extractDir, { recursive: true, force: true }); } catch { /* ignore */ }
+            global.popplerInstall = false;
+        }
     }
 
 
