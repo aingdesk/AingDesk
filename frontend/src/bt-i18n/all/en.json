@@ -395,6 +395,10 @@
         "src": "DuckDuckGo",
         "dst": "DuckDuckGo"
     },
+    "You.com": {
+        "src": "You.com",
+        "dst": "You.com"
+    },
     "360搜索": {
         "src": "360搜索",
         "dst": "360 Search"

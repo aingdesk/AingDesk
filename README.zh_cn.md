@@ -66,6 +66,12 @@ docker compose up -d
 docker-compose up -d
 ```
 
+## 环境变量
+
+| 变量 | 说明 | 必需 |
+|------|------|------|
+| `YDC_API_KEY` | You.com 联网搜索 API 密钥。 | 仅在使用 You.com 搜索时 |
+
 ## 编译
 ```bash
 git clone https://github.com/aingdesk/AingDesk.git
