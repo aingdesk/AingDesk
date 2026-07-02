@@ -90,6 +90,12 @@ yarn
 yarn dev
 ```
 
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `YDC_API_KEY` | You.com API key for web search. | Only if using You.com Search |
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=aingdesk/aingdesk&type=Date)](https://www.star-history.com/#aingdesk/aingdesk&Date)

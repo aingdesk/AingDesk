@@ -48,6 +48,7 @@
                         { label: $t("百度"), value: "baidu" },
                         { label: $t("搜狗"), value: "sogou" },
                         { label: $t("360搜索"), value: "360" },
+                        { label: $t("You.com"), value: "youchannels" },
                     ]' style="width:120px" v-model:value="targetNet" @update:value="setSearch" />
                 </div>
             </n-list-item>
