@@ -60,8 +60,8 @@ export const localYouComSearch = async (query: string): Promise<SearchResult[]> 
         const data = await response.json();
 
         // Parse You.com response format:
-        // { results: [{ title, url, description, snippets, contents }] }
-        const results = data.results || [];
+        // { results: { web: [{ title, url, description, snippets }] } }
+        const results = data.results?.web || [];
 
         return results.map((item: any) => {
             // Build content from description + snippets
