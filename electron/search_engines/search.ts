@@ -3,6 +3,7 @@ import { SearchResult } from "./utils";
 import { localDuckDuckGoSearch } from "./duckduckgo";
 import { localSogouSearch } from "./sogou";
 import { local360Search } from "./so360";
+import { localYouComSearch } from "./youcom";
 import { pub } from '../class/public'
 import { agentService } from '../service/agent';
 
@@ -128,6 +129,7 @@ export const searchEngines = {
     google: local360Search,
     so360: local360Search,
     360: local360Search,
+    youcom: localYouComSearch,
 };
 
 // 搜索网页函数
